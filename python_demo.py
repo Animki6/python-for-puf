@@ -24,15 +24,16 @@ if len(sys.argv) > 3:
 results_filepath = os.path.join(results_dir, results_filename)
 
 try:
-    ser = serial.Serial(
-	    port=sys.argv[1],
-	    baudrate=115200,
-	    parity=serial.PARITY_NONE,
-	    stopbits=serial.STOPBITS_ONE,
-	    bytesize=serial.EIGHTBITS
-    )
+	ser = serial.Serial(
+		port=sys.argv[1],
+		baudrate=115200,
+		parity=serial.PARITY_NONE,
+		stopbits=serial.STOPBITS_ONE,
+		bytesize=serial.EIGHTBITS
+	)
 except:
     print('Oops... Port {} could not be opened!'.format(sys.argv[1]))
+    print('Check port name and your permissons are correct.')
     sys.exit(1)
 
 
