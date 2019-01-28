@@ -1,15 +1,23 @@
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-file_path = sys.argv[1]
-
-
-df = pd.read_csv(file_path)
+df = None
+for i in range(len(sys.argv)-1):
+    file_path = sys.argv[i+1]
+    if df is None:
+        df = pd.read_csv(file_path)
+    else:
+        df = df.append(pd.read_csv(file_path), ignore_index=True)
+    print(df.shape)
+    print(file_path)
 
 print(df.shape)
 
-#df = df.drop([1,3,5])
+df = df.iloc[:, :127]
+
+print(df.shape)
 
 df_mean = df.mean(axis=0)
 

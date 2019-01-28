@@ -7,6 +7,7 @@ import serial
 
 results_dir = 'results'
 results_filename = 'test_output.csv'
+all_pairs = False
 
 
 if len(sys.argv) < 2:
@@ -21,6 +22,9 @@ else:
 if len(sys.argv) > 3:
     results_filename = sys.argv[3]+'.csv'
 
+if len(sys.argv) > 4:
+    all_pairs = True
+
 results_filepath = os.path.join(results_dir, results_filename)
 
 try:
@@ -33,7 +37,7 @@ try:
 	)
 except:
     print('Oops... Port {} could not be opened!'.format(sys.argv[1]))
-    print('Check port name and your permissons are correct.')
+    print('Check port name and your permissons.')
     sys.exit(1)
 
 
@@ -49,7 +53,11 @@ for i_num in range(num_of_iter):
     output = []
     print('Iteration number: {}'.format(i_num+1))
     start = time.time()
-    for i in range(128):
+    if all_pairs:
+        i_max = 128
+    else:
+        i_max = 1
+    for i in range(i_max):
 
         for j in range(i+1, 128):
  
@@ -81,6 +89,9 @@ for i_num in range(num_of_iter):
         file.write('\n')
 
     print('Output saved succesfully!')
+
+print('Done. Thank you!')
+
 
 
   
