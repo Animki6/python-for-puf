@@ -5,10 +5,15 @@ import datetime
 import serial
 
 
-results_dir = 'results'
+#results_dir = 'results_simple_NEW'
+results_dir = 'results_butterfly_NEW'
 results_filename = 'test_output.csv'
 all_pairs = False
+i_max = 128
 
+if '--help' in sys.argv:
+    print('Arguments: port, num_of_iter, output_file_name')
+    sys.exit(0)
 
 if len(sys.argv) < 2:
     print('Please specify USB port to use, e.g. "/dev/ttyUSB0" as an input argument!')
@@ -21,9 +26,6 @@ else:
 
 if len(sys.argv) > 3:
     results_filename = sys.argv[3]+'.csv'
-
-if len(sys.argv) > 4:
-    all_pairs = True
 
 results_filepath = os.path.join(results_dir, results_filename)
 
@@ -46,29 +48,28 @@ ser.isOpen()
 
 
 
-
 print('Starting getting board characterization. This may take a while.')
 for i_num in range(num_of_iter):
     header = []
-    output = []
+    #output = []
+    output = bytearray()
     print('Iteration number: {}'.format(i_num+1))
     start = time.time()
-    if all_pairs:
-        i_max = 128
-    else:
-        i_max = 1
+    
+    challenge_counter = 0
+
     for i in range(i_max):
-
-        for j in range(i+1, 128):
  
-            ser.write(bytes([i+1]))
-            ser.write(bytes([(j+1)]))
+        ser.write(bytes([i]))
 
-            header.append('{}x{}'.format(i+1, j+1))
+        header.append('{}'.format(i+1))
+        challenge_counter += 1
+        if challenge_counter % 8 == 0:
             puf_out = ser.read(1)
-            output.append(0 if puf_out == bytes([0x00]) else 1)
+            output += puf_out
+            #output.append(0 if puf_out == bytes([0x00]) else 1)
 
-        progress = (i / 128)* 100
+        progress = (i / i_max) * 100
         sys.stdout.write(" Progress: {:10.2f}% \r".format(progress, ) )
         #sys.stdout.flush()
 
@@ -85,7 +86,10 @@ for i_num in range(num_of_iter):
             file.write('\n')
 
     with open(results_filepath, 'a') as file:
-        file.write(','.join(map(str,output)))
+        #file.write(','.join(map(str,output)))
+        bits_str = ''.join(format(byte, '08b') for byte in output)
+        bits_separated = ','.join(bits_str)
+        file.write(bits_separated)
         file.write('\n')
 
     print('Output saved succesfully!')
